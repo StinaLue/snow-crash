@@ -1,0 +1,2 @@
+We already saw in level00 that in /etc/passwd (General user details) that the uid of Username level01 had a weird value starting with 42.
+After checking if the flag is, like in level00, encrypted with rot, we didn't find any flag that makes sense.
