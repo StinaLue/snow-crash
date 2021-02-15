@@ -1,2 +1,14 @@
-We already saw in level00 that in /etc/passwd (General user details) that the uid of Username level01 had a weird value starting with 42.
-After checking if the flag is, like in level00, encrypted with rot, we didn't find any flag that makes sense.
+There is a password entry in the /etc/passwd file (uncommon, usually they are stored in /etc/shadow)
+
+The password is hashed (from the hash appareance and our current informations, looks like classic DES crypt algorithm)
+42hDRfypTqqnw=crypt(secret_pw)
+
+We recover information about the crypt algorithm (https://en.wikipedia.org/wiki/Crypt_(C))
+
+crypt uses a salt, the 2 first characters of the hashed string are the salt (here, the salt is then 42, what a surprise !)
+42hDRfypTqqnw=crypt(secret_pw, salt=42)
+
+DES crypt also truncates the password to eight characters, so we know we only have to bruteforce through max 8 characters!
+
+we use the openssl library to try to crack the hash through a bruteforce attack
+
