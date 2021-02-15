@@ -1,0 +1,8 @@
+We found the file "level02.pcap" and recognized the type of file that we could read with WireShark.
+To do so, we copied the file on our local machine with the following command "scp -P 4242 level02@snow-crash:/home/user/level02/level02.pcap /Users/Stina/Documents/42_Projects/Code/snow-crash".
+In WireShark, we could see that the file contains a conversation between two computers.
+We "Followed" the TCP stream and found "wwwbugs login: l.le.ev.ve.el.lX.X" and "Password: ft_wandr...NDRel.L0L".
+The password did not work, so we were verifying what the "." in between the Password signify. 
+When we checked each connection, we found out that each lettter of the Password is always the last byte of the package. The dots have a hex value of 7F, which is DEL in ascii code.
+We then tried to reproduce the conversation : ft_wandr(DEL)(DEL)(DEL)NDRel(DEL)L0L which results in ft_waNDReL0L
+Success, the password lets us log into flag02.
