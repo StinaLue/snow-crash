@@ -1,0 +1,7 @@
+HOW WE FOUND IT:
+
+We used the command "find / -user level00 2>/dev/null" to find all the files belonging to the user level00 but we couldn't find anything interesting.
+We then replaces level00 by flag00 (find / -user flag00 2>/dev/null) and found two files: /usr/sbin/john and /rofs/usr/sbin/john (which are the same files, we verified with the diff command).
+Inside of the file "john" we found the letters "cdiiddwpgswtgt" but when trying to log into flag00, we get an error. After inspecting the letters, we thought that it might be encrypted and we tried several decryption forms, including ROT.
+We put the letters in here http://theblob.org/rot.cgi and found in rot11 "nottoohardhere" which we used to successfully connect to flag00.
+After launching the getflag command we now get the flag: x24ti5gi3x0ol2eh4esiuxias
