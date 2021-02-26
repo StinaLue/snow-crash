@@ -1,1 +1,14 @@
+1 - In level03 home folder, we find a setuid (user flag03) ELF executable telling us "Exploit me" when we run it
 
+2 - We use ltrace to trace c library calls made by the program, one is very interesting --> system("/usr/bin/env echo Exploit me")
+
+3 - We now know that the env is used to launch echo, and that the env path is modifiable by any user for its own context
+
+4 - We are going to trick the program to launch a program called "echo" that is actually something else --> /bin/getflag
+
+5 - In order to do that, we have to :
+	- copy, or make a link to /bin/getflag in a writable folder of our choice, and call it "echo" (we chose /tmp) --> cp /bin/getflag /bin/echo
+	- modify our env PATH to go through our chosen path first to find binaries --> export PATH=/tmp:$PATH
+	- launch the program --> ./level03
+
+6 - The program executes and launches "echo", which is actually /bin/getflag for us, with the rights of flag03, so we get the flag !
