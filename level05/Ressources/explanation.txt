@@ -1,0 +1,9 @@
+1 - In level04 home folder, we find a setuid (user flag04) perl script, that seems to listen for web input on port 4747
+
+2 - We find info about how the CGI perl module works --> https://metacpan.org/pod/CGI | We understand that a GET parameter "x" gets echoed
+
+3 - We try around for command execution with stuff like ?x=test;ls or ?x=test&&ls but it doesn't work
+
+4 - We try for command substitution in our GET parameter ?x=$(ls) or ?x=`ls` and it works !
+
+5 - We launch the command getflag this way, with the privileges of flag04 thanks to the setuid bit
