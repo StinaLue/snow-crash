@@ -63,3 +63,8 @@ We try [x ${`id`}] --> PHP launches 'id' with bash, and tries to interpret its o
 it returns an error, but we don't care, as the error tells us the output of our commands !
 
 6 - We use the payload [x ${`getflag`}] and get the flag
+
+BONUS --> we can even get a shell by using PHP complex curly braces syntax (https://www.php.net/manual/en/language.types.string.php#language.types.string.parsing.complex)
+We get the following payload with no quotes [x {${system(bash)}}] to launch bash through the system function of PHP
+The PHP interpreter automatically translates bash to 'bash' --> PHP Notice:  Use of undefined constant bash - assumed 'bash' in /home/user/level06/level06.php(4) : regexp code on line 1
+And we get the return value of the system function, which is a bash shell for us !!!
