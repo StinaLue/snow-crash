@@ -1,0 +1,11 @@
+1 - We find a setuid ELF level08 and a token file in our home folder / we can't open the token file as all access belongs to flag08
+
+2 - We inspect the program level08, we see that it expects a file as argv[1], we test with the token file --> "doesn't work You may not access 'token'"
+
+3 - We try with another file we create (/tmp/test), and it outputs the file contents / So how does the restriction for the token file work ??
+
+4 - We inspect the program behavior with ltrace --> ltrace ./level08 token --> we find out strstr is used to check if the string "token" appears in the file name 
+
+5 - To bypass this security measure and be able to read the contents of the precious token file, we are going to use symbolic links --> we will create a link that points to our secret token file, and use our link as the file to open for the program ./level08 --> This will bypass the security check, and read the token file for us with the rights of the setuid user ! (flag08)
+
+6 - We launch the program with our symbolic link, and EZ PZ we get the flag
