@@ -1,9 +1,11 @@
-1 - In level04 home folder, we find a setuid (user flag04) perl script, that seems to listen for web input on port 4747
+1 - When logging into level05, we get a prompt "You have new mail." which indicates to check the /var/mail/ folder. And indeed, we find a "level05" file which contains "*/2 * * * * su -c "sh /usr/sbin/openarenaserver" - flag05"
 
-2 - We find info about how the CGI perl module works --> https://metacpan.org/pod/CGI | We understand that a GET parameter "x" gets echoed
+2 - That looks like cron! The first parameter tells us that the command "su -c "sh /usr/sbin/openarenaserver"" is executed each 2 minutes.
 
-3 - We try around for command execution with stuff like ?x=test;ls or ?x=test&&ls but it doesn't work
+3 - We check what is inside of "/usr/sbin/openarenaserver" to see what is executed each 2 minutes. Each file in "/opt/openarenaserver/" is being executed and then directly removed. 
 
-4 - We try for command substitution in our GET parameter ?x=$(ls) or ?x=`ls` and it works !
+4 - We realize that we have write rights in "/opt/openarenaserver/" and add a file which includes "getflag". Indeed, this file gets executed and deleted after 2 minutes. But we can't see the output of the file we created.
 
-5 - We launch the command getflag this way, with the privileges of flag04 thanks to the setuid bit
+5 - Since the output does not get reflected, we create a new file in "/opt/openarenaserver/", this time we write into it: "getflag > /tmp/text.txt". 
+
+6 - In the following two minutes we check the /tmp/text.txt file and voila, we have the flag.
