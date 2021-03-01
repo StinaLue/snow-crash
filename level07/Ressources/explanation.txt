@@ -1,0 +1,12 @@
+1 - In out home directory we find the executable "level07". When executing, we see the output "level07". 
+We check usual things like strace and ltrace to see what could be inside of this file. There are two interesting things inside of ltrace, we see "getenv("LOGNAME") = "level07"" and system("/bin/echo level07 "level07.
+
+2 - We try to change the LOGNAME, to see if the output changes when we run the program. And indeed, the program prints what is inside of LOGNAME.
+
+3 - We now know, that we can change LOGNAME to whatever we want and that th program "level07" will take it into account.
+To go one step further, we set LOGNAME="`getflag`", but we get an error : 
+	"Check flag.Here is your token :
+	sh: 2: Syntax error: ")" unexpected".
+4 - To parse getflag from within the program level07, we have to either put LOGNAME="\`getflag\`" or LOGNAME=echo && getflag.
+
+5 - We execute the program and we get the flag! fiumuikeil55xe9cu4dood66h
