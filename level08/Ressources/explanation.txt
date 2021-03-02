@@ -9,3 +9,5 @@
 5 - To bypass this security measure and be able to read the contents of the precious token file, we are going to use symbolic links --> we will create a link that points to our secret token file, and use our link as the file to open for the program ./level08 --> This will bypass the security check, and read the token file for us with the rights of the setuid user ! (flag08)
 
 6 - We launch the program with our symbolic link, and EZ PZ we get the flag
+But wait, the flag is not working as a password for level09?
+Let's try to login to flag08 with this password... that works ! We can now launch su -c getflag flag08 from level08 to get the real flag

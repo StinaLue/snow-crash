@@ -1,0 +1,14 @@
+1 - We find a setuid ELF level09 and a token file in our home folder / we can open the token file and see a string partly composed of gibberish characters
+token appears to be our goal, but not in its current state, it looks ciphered because of the unreadable characters
+
+2 - We test the level09 program -->
+	- it expects only one argument
+	- argv[1] can be a string or a file
+	- we test with several strings ("jkelwq;rjeiorqu", "AAAAAAAA", "aaaaaaaaaa", "BBBBBB"...)
+	- The logic always seems to be the same --> while going through each letter of the string/file, the program increments the value of the char by its own index value in the string (aaaaaaa = a(+0)b(+1)c(+2)d(+3)e(+4)f(+5)g(+6)). That would explain why we get gibberish characters in the end of our token file ! It was surely ciphered with this program !
+
+3 - The cipher logic being pretty simple, we create a short python script that takes a file as an input, and does the reverse of what the ./level09 program does --> go through each letter, and decrement each letter's value by its index
+
+4 - We get a readable string out of the execution of our script with the token file ! But it doesn't work to login for level10... However, it does to login as flag09 (same logic as the last time)
+
+5 - We login as flag09 and launch the getflag command
