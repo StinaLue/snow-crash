@@ -1,0 +1,25 @@
+1 - We find a setuid ELF level10 and a token file in our home folder / token is unreadable by us because of its file permissions
+token appears to be our goal, so let's try to find a way to read it !
+
+2 - We test the level10 program, which appears to try to send a file to a specific address on port 6969 -->
+	- it expects only two arguments
+	- argv[1] should be the file to send / argv[2] should be the address to send the file to
+	- we try to send the precious token file to ourselves this way, doesn't work :( we understand through ltrace that the C function 'access' is used to verify we have permissions for this file as level10 (ltrace ./level10 token whatev) / we try to send another file that belongs to us this way (for example /tmp/lol) and it works
+
+3 - So we have to find a way to bypass this access function to read the token --> we look up for ways to bypass the verification and end up finding this wikipedia page --> https://en.wikipedia.org/wiki/Time-of-check_to_time-of-use
+We read on and see an example that looks like what our program is doing in the wikipedia page ! (using 'access(file)' and THEN 'open(file)')
+It seems like we could exploit this same vulnerability for our program, here's how the basic logic goes :
+	1) make the program see a file that belongs to us when it calls 'access' on it (Program goes --> "Oki dok, u hav access to this file, u can go on")
+	2) modify this file so that in now points to the secret token when the program calls 'open' on it >:) (sneak 100) (Program goes --> "Imma open and send this file, as I know you have access to it")
+The tricky part is timing, we have a very short time window between 'access' and 'open'
+
+4 - We create four loops :
+	ON THE VM:
+	1) The first loop creates a symbolic link to a file that belongs to us (ln -fs /tmp/ourtoken /tmp/tokenlink) and then instantly modifies this link to point to the secret token (ln -fs /home/user/level10/token /tmp/tokenlink)
+	2) The second loop launches the vulnerable program very fast
+	ON THE EXPLOIT MACHINE:
+	3) The third loop listens on port 6969 on our machine (to intercept what the program sends to us) --> nc -lvnp 6969
+	4) The fourth loop keeps track of everything that was sent to our exploit machine
+
+5 - After a very short time, we get the precious secret contents of the token file !
+We can now launch getflag as flag10
