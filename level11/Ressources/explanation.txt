@@ -1,0 +1,11 @@
+1 - We find a setuid lua script on our home folder, it seems to be listening on port 5151 / We confirm by trying to connect to localhost:5151 (nc 127.0.0.1 5151)
+
+2 - The script checks if the user input password is correct and exits / For the check, the script uses popen to read the input --> "echo " + inputpass +" | sha1sum", "r"
+We find an obvious way to make the program execute unexpected commands
+
+3 - We inject in "inputpass" a string so that echo gets executed and THEN our unexpected command --> "test && ls"
+however, we can't read the output, so we're gonna have to redirect the output to a file we can read 
+"test && ls > /tmp/hallo"
+
+4 - Bingo, it works, now we only have to input "test && getflag > /tmp/hallo" and we can then read the flag in the "/tmp/hallo" file
+
