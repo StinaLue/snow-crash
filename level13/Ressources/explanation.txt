@@ -1,0 +1,29 @@
+1 - We find a setuid binary level13 in our home folder / launching it gives us the following message --> UID 2013 started us but we we expect 4242
+verify our UID with the command "id", and indeed our user ID is 2013 --> uid=2013(level13) gid=2013(level13) groups=2013(level13),100(users)
+
+2 - Let's understand how the program checks for our ID --> ltrace ./level13 --> getuid() = 2013
+the function getuid is used ! and we need to change our UID to 4242, so how can we do ?
+
+3 - We lookup ways to fake our user id and end up on this discussion --> https://www.linuxquestions.org/questions/programming-9/faking-uids-917910/
+It seems like there is a way to bypass the getuid function by loading a fake dynamic library with a getuid function which will "overwrite" the real getuid function in our program
+
+So for our exploit we : 
+	1) Create a c file with our fake getuid function inside (needs to be the same prototype as the real one)
+	2) Create a dynamic library out of the c file from step 1
+	3) set the LD_PRELOAD env variable to point to our fake library so that it overwrites the true getuid function in the program
+
+After this is done we test our program but it still doesn't work, we read on and discover the reason why it doesn't work --> https://www.boiteaklou.fr/Abusing-Shared-Libraries.html
+Knowing the program is setuid, the environment for flag13 is probably not the same as ours, and so it doesn't look at the env variable LD_PRELOAD for loading dynamic libs !
+
+Knowing this, we create a non-setuid version of the program, by copying it ourselves to a directory we can write to (cp /home/user/level13/level13 /tmp/level13)
+
+This time we try again, and get the flag !
+
+===============================
+
+BONUS
+It is also possible to get the flag by tricking the process while we run it in GDB by modifying the return value of getuid "on the go"
+When we use gdb on the program, it removes its setuid properties, but anyway they are not needed for this challenge
+
+BONUS READING
+https://en.wikipedia.org/wiki/DLL_injection
