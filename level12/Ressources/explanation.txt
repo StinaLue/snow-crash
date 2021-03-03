@@ -1,0 +1,28 @@
+1 - We find a new perl script in our home folder / Once more, it uses the CGI module, which indicates that the perl script handles HTTP requests
+
+2 - We inspect further the script, there are two parameters --> x and y
+x gets modified in the function t	--> all small letters are made CAPITAL ($xx =~ tr/a-z/A-Z/;)
+					--> everything coming after a space gets deleted ($xx =~ s/\s.*//;)
+y doesn't get modified
+
+3 - We find a statement that looks very vulnerable to input injection --> @output = `egrep "^$xx" /tmp/xd 2>&1`;
+the script is launching a subshell with our input inside !
+
+the $xx variable is our modified x parameter
+
+We have to find a way to make our x parameter bypass the filters and inject code 
+
+After some trial and error
+	- Trying directly x=test;/bin/getflag>/tmp/flag --> doesn't work (`egrep "^TEST;/BIN/GETFLAG>/TMP/FLAG" /tmp/xd 2>&1`
+	- Trying to use the environment TEST="test;/bin/getflag>/tmp/flag" --> doesn't work (the environment of the program is not ours this time as we didn't launch it ourselves !)
+
+We finally find a reliable solution --> create a bash script doing whatever we want with CAPITAL LETTERS in /tmp/ so that we bypass both filters ! (the big letter stuff and the delete-after-whitespace thingy)
+
+We add executable rights to this script (chmod +x) so that we only need to give $(/tmp/THESCRIPT) as x parameter
+
+However, as it is now it's not gonna work --> $(/tmp/THESCRIPT) gets transformed to $(/TMP/THESCRIPT), and /TMP folder doesn't exist
+
+So, we do our research, and find a trick to bypass this restriction --> bash wildcards 
+
+our final injection is $(/*/THESCRIPT) --> THESCRIPT is found through the wildcard, it executes, and gives us our precious FLAG !
+
