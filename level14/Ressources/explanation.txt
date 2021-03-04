@@ -1,0 +1,41 @@
+1 - Erm... Absolutely nothing on the home folder for level14 ?
+We try to find files belonging to us --> find / -user level14 2>/dev/null | grep -v /proc --> nothing D:
+... maybe files belonging to flag14 ? --> find / -user flag14 2>/dev/null --> nooope
+
+Launching getflag directly sadly doesn't give us a free flag either
+
+Seems like the only thing we can do is use getflag, so let's try to understand how it actually works to get the final flag
+
+2 - We launch ltrace on getflag --> ltrace /bin/getflag
+Interesting, the program behaves differently compared to usually !
+
+We see that the function ptrace is used, returns -1, and then the program outputs the string --> "You should not reverse this"
+Oh okay then, guess we'll stop there ... :((
+Just kidding of course ! We are haxxors and haxxors never back down 
+
+3 - We look up what the hell ptrace is --> It is actually a function used mostly for debugging purposes (it lets a process attach to another to check it and modify it) ! So how does the check work (The check the program makes to verify we are not using a debugger before going further) ?
+
+We look up ways to detect if a debugger is being used on a process and find this page --> https://stackoverflow.com/questions/3596781/how-to-detect-if-the-current-process-is-being-run-by-gdb
+
+the common way to block debug type processes on a program is this:
+if (ptrace(PTRACE_TRACEME, 0, NULL, 0) == -1)
+  printf("traced!\n");
+It allows the program to verify it's not already attached by another process
+
+4 - We look for ways to bypass this ptrace call
+We find this solution, which uses the same LD_PRELOAD trick from the previous level (here to overwrite the ptrace function with a custom one):
+https://dev.to/nuculabs_dev/bypassing-ptrace-calls-with-ldpreload-on-linux-12jl
+
+We try it out, but it seems like there are many checks to block such exploit :(
+level14@SnowCrash:~$ export LD_PRELOAD="/tmp/liblol.so"
+level14@SnowCrash:~$ /bin/getflag
+Injection Linked lib detected exit..
+
+5 - Ok, let's find another way to exploit this program --> We're going to run the program with GDB and modify the values "on the go" in order to bypass all protections !
+
+	1) We set a breakpoint at the function ptrace / exit it and modify its return value (-1 --> 0 in register eax)
+	2) We bypassed the ptrace protection !
+	3) We set a breakpoint at the function getuid / exit it and modify its return value (2014 (level14 id) --> 3014 (flag14 id) in register eax)
+	4) We get the token for user flag14 !
+
+We realize that we could have gotten all the different flags this way, by each time modifying the return value of getuid in /bin/getflag, lol 
