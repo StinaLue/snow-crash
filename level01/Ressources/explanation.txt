@@ -1,6 +1,7 @@
 We already saw in level00 that in the /etc/passwd file (General user details) that the password entry of Username level01 had a weird value starting with 42.
 
 This password entry in the /etc/passwd file is uncommon, since usually they are stored in /etc/shadow.
+(CF passwdfile_man_extract.txt)
 
 The password is hashed (from the hash appareance and our current informations, looks like classic DES crypt algorithm)
 42hDRfypTqqnw=crypt(secret_pw)
@@ -12,5 +13,4 @@ Crypt uses a salt, the 2 first characters of the hashed string are the salt (her
 
 DES crypt also truncates the password to eight characters, so we know we only have to bruteforce through max 8 characters!
 
-we use the openssl library to try to crack the hash through a bruteforce attack
-
+We crack the hash through a by computing the DES crypt hash of each password in a wordlist, until we find the right one, abcdefg

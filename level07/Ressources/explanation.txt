@@ -1,4 +1,4 @@
-1 - In out home directory we find the executable "level07". When executing, we see the output "level07". 
+1 - In our home directory we find the executable "level07". When executing, we see the output "level07". 
 We check usual things like strace and ltrace to see what could be inside of this file. There are two interesting things inside of ltrace, we see "getenv("LOGNAME") = "level07"" and system("/bin/echo level07 "level07.
 
 2 - We try to change the LOGNAME, to see if the output changes when we run the program. And indeed, the program prints what is inside of LOGNAME.
